@@ -44,9 +44,6 @@ void UpdateSprite(sprite_t *spr)
 {
 	int newx = spr->x + spr->vx;
 	int newy = spr->y + spr->vy;
-	spr->x=newx;
-	spr->y=newy;
-	
 	if ((newx + spr->w) >= res_w || (newy + spr->h) >= res_h || newx <= 0 || newy <= 0)
 	{
 		int vx = spr->vx;
