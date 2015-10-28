@@ -1,9 +1,10 @@
 #include <psx/gx.h>
 #include "../res/kid.tim.c"
 
+#define NUM_SPRITES 4
+
 typedef struct sprite
 {
-	int occupied;
 	int tx, ty; // Texture coordinates
 	int x, y; // Position on screen
 	uint8_t w, h; // Size
@@ -16,28 +17,20 @@ uint16_t res_h;
 struct gx_texture *texture;
 uint16_t tex_w;
 uint16_t tex_h;
-sprite_t sprites[32];
+sprite_t sprites[NUM_SPRITES];
 
-sprite_t *InitSprite(int x, int y, int tx, int ty, int vx, int vy)
+sprite_t *InitSprite(int index, int x, int y, int tx, int ty, int vx, int vy)
 {
-	for (int i = 0; i < 32; ++i)
-	{
-		sprite_t *spr = &sprites[i];
-		if (!spr->occupied)
-		{
-			spr->occupied = 1;
-			spr->x = x;
-			spr->y = y;
-			spr->vx = vx;
-			spr->vy = vy;
-			spr->tx = tx;
-			spr->ty = ty;
-			spr->w = tex_w;
-			spr->h = tex_h;
-			return spr;
-		}
-	}
-	return 0;
+	sprite_t *spr = &sprites[i];
+	spr->x = x;
+	spr->y = y;
+	spr->vx = vx;
+	spr->vy = vy;
+	spr->tx = tx;
+	spr->ty = ty;
+	spr->w = tex_w;
+	spr->h = tex_h;
+	return spr;
 }
 
 void UpdateSprite(sprite_t *spr)
@@ -68,13 +61,10 @@ int main(void)
 	texture = GX_LoadTIM(kid_tim);
 	GX_GetTextureDims(texture, &tex_w, &tex_h);
 	
-	for (int i = 0; i < 32; ++i)
-		sprites[i].occupied = 0;
-
-	InitSprite(50, 50, 0, 0, -1, 1);
-	InitSprite(60, 30, 0, 0, 1, 1);
-	InitSprite(120, 20, 0, 0, -1, -1);
-	InitSprite(100, 80, 0, 0, 1, -1);
+	InitSprite(0, 50, 50, 0, 0, -1, 1);
+	InitSprite(1, 60, 30, 0, 0, 1, 1);
+	InitSprite(2, 120, 20, 0, 0, -1, -1);
+	InitSprite(3, 100, 80, 0, 0, 1, -1);
 	
 	while (1)
 	{
@@ -82,21 +72,18 @@ int main(void)
 		
 		GX_SelectTexture(texture);
 		
-		for (int i = 0; i < 32; ++i)
+		for (int i = 0; i < NUM_SPRITES; ++i)
 		{
 			sprite_t *spr = &sprites[i];
-			if (spr->occupied)
-			{
-				UpdateSprite(&sprites[i]);
-				GX_DrawRectangleTextured(
-					spr->x,
-					spr->y,
-					spr->w,
-					spr->h,
-					spr->tx,
-					spr->ty
-					);
-			}
+			UpdateSprite(spr);
+			GX_DrawRectangleTextured(
+				spr->x,
+				spr->y,
+				spr->w,
+				spr->h,
+				spr->tx,
+				spr->ty
+				);
 		}
 		
 		GX_Sync();
